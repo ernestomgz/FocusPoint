@@ -1,0 +1,10 @@
+/* Minimal reset */
+* { box-sizing: border-box; }
+html, body, #app { height: 100%; }
+html, body { margin: 0; padding: 0; }
+h1,h2,h3,h4,h5,h6 { margin: 0; font-weight: 700; }
+p { margin: 0; }
+a { text-decoration: none; color: inherit; }
+table { border-collapse: collapse; }
+button { cursor: pointer; }
+

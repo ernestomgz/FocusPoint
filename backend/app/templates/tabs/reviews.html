@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="panel">
+  <div class="row" style="align-items:center">
+    <div class="col">
+      <h2>Week Reviews</h2>
+      <div class="muted">Period: <strong>{{ ws.strftime('%d/%m/%Y') }}</strong> — <strong>{{ we.strftime('%d/%m/%Y') }}</strong></div>
+    </div>
+    <div class="col" style="text-align:right">
+      <form method="get" action="/reviews" class="inline">
+        <a class="btn secondary" href="/reviews?week_start_dmy={{ prev_ws_dmy }}">« Prev</a>
+        <a class="btn secondary" href="/reviews?week_start_dmy={{ this_ws_dmy }}">This week</a>
+        <a class="btn secondary" href="/reviews?week_start_dmy={{ next_ws_dmy }}">Next »</a>
+        <input class="input date-dmy" type="text" name="week_start_dmy" placeholder="DD/MM/YYYY" autocomplete="off" style="width:140px">
+        <button class="btn secondary">Go</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>Week at a glance</h3>
+  <div style="display:grid; gap:8px">
+    {% for row in day_rows %}
+      <div style="display:grid; grid-template-columns: 60px 1fr 70px; gap:10px; align-items:center">
+        <div style="text-align:right">{{ row.label }}</div>
+        <div style="background:#1c2030; border:1px solid #2a2e39; border-radius:999px; height:14px; overflow:hidden">
+          <div style="height:100%; width: {{ row.pct }}%; background: linear-gradient(90deg, #7c4dff, #9b7bff);"></div>
+        </div>
+        <div>{{ row.hhmm }}</div>
+      </div>
+    {% endfor %}
+    {% if (day_rows|length) == 0 %}
+      <div class="muted">No actions this week.</div>
+    {% endif %}
+  </div>
+  <div style="margin-top:8px" class="muted">Total this week: <strong>{{ week_total_hhmm }}</strong></div>
+</div>
+
+<div class="panel">
+  <h3>By project</h3>
+  <table class="table">
+    <thead><tr><th>Project</th><th>Time</th><th>Share</th></tr></thead>
+    <tbody>
+      {% for p in proj_rows %}
+        <tr>
+          <td>{{ p.name }}</td>
+          <td>{{ p.hhmm }}</td>
+          <td>{{ p.share }}</td>
+        </tr>
+      {% endfor %}
+      {% if (proj_rows|length) == 0 %}
+        <tr><td colspan="3" class="muted">No project time this week.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+{% include 'includes/calendar.html' %}
+{% endblock %}
+

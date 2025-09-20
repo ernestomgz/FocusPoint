@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="panel">
+  <div class="row" style="align-items:end">
+    <div class="col"><h2>Projects</h2></div>
+    <div class="col" style="text-align:right">
+      <form method="get" action="/projects" class="inline">
+        <label class="label">Category</label>
+        <select class="input" name="category_id">
+          <option value="">(all)</option>
+          {% for c in categories %}
+            <option value="{{ c.id }}" {% if category_id and c.id==category_id %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+        <label class="label">Project</label>
+        <select class="input" name="project_id">
+          {% for p in projects %}
+            <option value="{{ p.id }}" {% if selected_pid and p.id==selected_pid %}selected{% endif %}>{{ p.name }}</option>
+          {% endfor %}
+        </select>
+        <label class="label">View</label>
+        <select class="input" name="view">
+          <option value="list" {% if view=='list' %}selected{% endif %}>List</option>
+          <option value="node" {% if view=='node' %}selected{% endif %}>Node</option>
+        </select>
+        <button class="btn secondary">Open</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Project form -->
+<div class="panel">
+  <h3>Create / Edit Project</h3>
+  <form id="projForm" method="post" action="/api/projects/upsert">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+    <div class="row">
+      <div class="col">
+        <label class="label">Existing</label>
+        <select class="input" name="id" id="proj_id">
+          <option value="">(new project)</option>
+          {% for p in projects %}
+            <option value="{{ p.id }}" {% if selected_pid and p.id==selected_pid %}selected{% endif %}>{{ p.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col">
+        <label class="label">Category</label>
+        <select class="input" name="category_id" id="proj_cat">
+          <option value="">(none)</option>
+          {% for c in categories %}
+            <option value="{{ c.id }}" {% if category_id and c.id==category_id %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col">
+        <label class="label">Name</label>
+        <input class="input" type="text" name="name" id="proj_name" required />
+      </div>
+      <div class="col">
+        <label class="label">End date (DD/MM/YYYY)</label>
+        <input class="input date-dmy" type="text" name="end_date_dmy" id="proj_end" placeholder="DD/MM/YYYY" autocomplete="off" required />
+      </div>
+    </div>
+
+    <label class="label">Objective (optional)</label>
+    <input class="input" type="text" name="objective" id="proj_obj" />
+
+    <label class="label">Description (optional)</label>
+    <textarea class="input" name="description" id="proj_desc" rows="2"></textarea>
+
+    <div class="row">
+      <div class="col">
+        <label class="label">Status</label>
+        <select class="input" name="status" id="proj_status">
+          <option value="active">active</option>
+          <option value="on_hold">on_hold</option>
+          <option value="archived">archived</option>
+        </select>
+      </div>
+      <div class="col">
+        <label class="label">Color (hex)</label>
+        <input class="input" type="text" name="color" id="proj_color" placeholder="#7c4dff" />
+      </div>
+      <div class="col" style="align-self:end">
+        <button class="btn">Save Project</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% if view == 'list' %}
+
+<div class="panel">
+  <h3>Milestones</h3>
+  <form id="msForm" method="post" action="/api/milestones/upsert">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+    <div class="row">
+      <div class="col">
+        <label class="label">Project</label>
+        <select class="input" name="project_id" id="ms_project" required>
+          {% for p in projects %}
+            <option value="{{ p.id }}" {% if selected_pid and p.id==selected_pid %}selected{% endif %}>{{ p.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col">
+        <label class="label">Existing milestone</label>
+        <select class="input" name="id" id="ms_id">
+          <option value="">(new milestone)</option>
+          {% for m in milestones %}
+            <option value="{{ m.id }}">{{ m.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col">
+        <label class="label">Name</label>
+        <input class="input" type="text" name="name" id="ms_name" required />
+      </div>
+      <div class="col">
+        <label class="label">End date (DD/MM/YYYY)</label>
+        <input class="input date-dmy" type="text" name="end_date_dmy" id="ms_end" placeholder="DD/MM/YYYY" autocomplete="off" required />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label class="label">% complete</label>
+        <input class="input" type="number" name="percent_complete" id="ms_percent" min="0" max="100" value="0" required />
+      </div>
+      <div class="col">
+        <label class="label">Status</label>
+        <select class="input" name="status" id="ms_status">
+          <option value="active">active</option>
+          <option value="on_hold">on_hold</option>
+          <option value="done">done</option>
+        </select>
+      </div>
+      <div class="col">
+        <label class="label">Depends on (optional)</label>
+        <select class="input" name="dependent_to_id" id="ms_dep">
+          <option value="">(none)</option>
+          {% for m in milestones %}
+            <option value="{{ m.id }}">{{ m.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col" style="align-self:end">
+        <button class="btn">Save Milestone</button>
+      </div>
+    </div>
+
+    <label class="label">Note (optional)</label>
+    <input class="input" type="text" name="note" id="ms_note" />
+  </form>
+</div>
+
+<div class="panel">
+  <h3>Milestones in project</h3>
+  <table class="table">
+    <thead><tr><th>Name</th><th>End</th><th>%</th><th>Note</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for m in milestones %}
+      <tr id="m-{{ m.id }}">
+        <td>{{ m.name }}</td>
+        <td>{{ m.end_date.strftime('%d/%m/%Y') }}</td>
+        <td>
+          <form method="post" action="/api/milestones/{{ m.id }}/percent" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <input class="input" type="number" name="value_num" min="0" max="100" value="{{ m.percent_complete }}" style="width:80px" />
+            <button class="btn secondary">Save</button>
+          </form>
+        </td>
+        <td>
+          <form method="post" action="/api/milestones/{{ m.id }}/note" class="inline" style="width:100%">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <input class="input" type="text" name="note" value="{{ m.note or '' }}" />
+            <button class="btn secondary">Save</button>
+          </form>
+        </td>
+        <td>{{ m.status }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% else %}
+
+<div class="panel">
+  <h3>Milestones (Node View)</h3>
+  <div class="row" style="gap:8px; align-items:center; margin-bottom:6px">
+    <button id="btnFit" class="btn secondary" type="button">Fit</button>
+    <button id="btnLayout" class="btn secondary" type="button">Relayout</button>
+    <label class="label"><input id="hideDone" type="checkbox" style="vertical-align:middle; margin-right:6px">Hide Done</label>
+  </div>
+  <div id="net" style="height:560px; border:1px solid var(--border); border-radius:12px; background:#fff;"></div>
+
+  <script>
+    (async function(){
+      const pid = {{ selected_pid or 'null' }};
+      if (!pid) {
+        document.getElementById('net').innerHTML = '<div style="padding:16px">Select a project to see the graph.</div>';
+        return;
+      }
+      const res = await fetch(`/api/projects/${pid}/graph`);
+      const data = await res.json();
+      function filtered(elements){
+        const hide = document.getElementById('hideDone').checked;
+        if(!hide) return elements;
+        const nodes = (elements.nodes||[]).filter(n => (n.status||'') !== 'done');
+        const keep = new Set(nodes.map(n=>String(n.id)));
+        const edges = (elements.edges||[]).filter(e => keep.has(String(e.from)) && keep.has(String(e.to)));
+        return {nodes, edges};
+      }
+      const container = document.getElementById('net');
+      let ds = filtered(data);
+      const nodes = new vis.DataSet(ds.nodes);
+      const edges = new vis.DataSet(ds.edges.map(e => ({
+        ...e, arrows:{to:{enabled:true, type:'vee', scaleFactor:1.6}},
+        smooth:{type:'cubicBezier'}, color:{color:'#2f1bb3', highlight:'#7c4dff', hover:'#7c4dff'}, width:4
+      })));
+      const options = {
+        nodes: { shape: 'box', borderWidth: 3, color: { background:'#ffffff', border:'#cccccc', highlight:{background:'#ffffff', border:'#7c4dff'} }, font:{color:'#111', size:12, face:'Inter, system-ui, sans-serif', multi:true}, margin:10 },
+        edges: { arrows:{to:{enabled:true, type:'vee', scaleFactor:1.6}}, width:4, color:{color:'#2f1bb3', highlight:'#7c4dff', hover:'#7c4dff'}, smooth:{type:'cubicBezier'} },
+        layout: { hierarchical: { enabled: true, direction: 'LR', levelSeparation: 160, nodeSpacing: 120 } },
+        physics: false,
+        interaction: { hover:true, tooltipDelay:80, zoomView:true, dragView:true }
+      };
+      const network = new vis.Network(container, {nodes, edges}, options);
+      document.getElementById('btnFit').onclick = () => network.fit({animation:{duration:300}});
+      document.getElementById('btnLayout').onclick = () => { network.setOptions({ layout: { hierarchical: { enabled:true, direction:'LR', levelSeparation:160, nodeSpacing:120 } }, physics:false }); network.fit({animation:{duration:300}}); };
+      document.getElementById('hideDone').onchange = () => {
+        const f = filtered(data);
+        nodes.clear(); edges.clear();
+        nodes.add(f.nodes);
+        edges.add(f.edges.map(e => ({...e, arrows:{to:{enabled:true, type:'vee', scaleFactor:1.6}}, smooth:{type:'cubicBezier'}, color:{color:'#2f1bb3', highlight:'#7c4dff', hover:'#7c4dff'}, width:4})));
+        network.fit({animation:{duration:200}});
+      };
+      network.on('doubleClick', params => {
+        if (params.nodes && params.nodes.length) {
+          const id = params.nodes[0];
+          window.location.href = '/projects?project_id=' + pid + '&view=list#m-' + id;
+        }
+      });
+    })();
+  </script>
+</div>
+
+{% endif %}
+
+{% include 'includes/calendar.html' %}
+{% endblock %}
+

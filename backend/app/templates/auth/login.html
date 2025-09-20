@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="panel auth">
+<h2>Sign in</h2>
+<form method="post" action="/login">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+<label class="label">Email</label>
+<input class="input" type="email" name="email" required />
+
+
+<label class="label">Password</label>
+<input class="input" type="password" name="password" required />
+
+
+<div class="row" style="margin-top:8px;">
+<button class="btn">Login</button>
+</div>
+</form>
+</div>
+{% endblock %}

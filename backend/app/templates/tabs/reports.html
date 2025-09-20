@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="panel">
+  <h2>Reports</h2>
+  {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+  {% if success %}<div class="flash success">{{ success }}</div>{% endif %}
+
+  <form method="post" action="/api/reports/generate" class="row">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="col">
+      <label class="label">Type</label>
+      <select class="input" name="type" required>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+    </div>
+    <div class="col">
+      <label class="label">Start (DD/MM/YYYY) — leave blank for current period</label>
+      <input class="input date-dmy" type="text" name="start_dmy" placeholder="DD/MM/YYYY" autocomplete="off">
+    </div>
+    <div class="col" style="align-self:end">
+      <button class="btn">Generate PDF</button>
+    </div>
+  </form>
+</div>
+
+<div class="panel">
+  <h3>Generated files</h3>
+  <table class="table">
+    <thead><tr><th>Type</th><th>Period</th><th>Created</th><th></th></tr></thead>
+    <tbody>
+      {% for r in reports %}
+        <tr>
+          <td>{{ r.period_type|capitalize }}</td>
+          <td>{{ r.period_start.strftime('%d/%m/%Y') }} — {{ r.period_end.strftime('%d/%m/%Y') }}</td>
+          <td>{{ r.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td><a class="btn secondary" href="/api/reports/download?id={{ r.id }}">Download</a></td>
+        </tr>
+      {% endfor %}
+      {% if (reports|length) == 0 %}
+        <tr><td colspan="4" class="muted">No reports yet.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+{% include 'includes/calendar.html' %}
+{% endblock %}
+

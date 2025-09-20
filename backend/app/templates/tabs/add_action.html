@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="panel">
+  <h2>Add Action</h2>
+
+  <form method="post" action="/api/actions/add" class="row" id="addActionForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+
+    <div class="col">
+      <label class="label">Date (DD/MM/YYYY)</label>
+      <input class="input date-dmy" type="text" name="date_dmy" id="act_date" placeholder="DD/MM/YYYY" autocomplete="off" required value="{{ day_dmy }}" />
+    </div>
+
+    <div class="col">
+      <label class="label">Project → Milestone</label>
+      <input class="input" list="milestoneList" id="ms_lookup" placeholder="Type to search" />
+      <datalist id="milestoneList">
+        {% for m in milestones %}
+          <option data-project-id="{{ m.project_id }}" data-milestone-id="{{ m.id }}" value="{{ m.project_name }} → {{ m.name }}"></option>
+        {% endfor %}
+      </datalist>
+      <input type="hidden" name="project_id" id="project_id" />
+      <input type="hidden" name="milestone_id" id="milestone_id" />
+      <script>
+        // When user picks an option from datalist, copy IDs into hidden fields
+        (function(){
+          const inp = document.getElementById('ms_lookup');
+          const list = document.getElementById('milestoneList');
+          const pid = document.getElementById('project_id');
+          const mid = document.getElementById('milestone_id');
+          inp.addEventListener('input', () => {
+            const val = inp.value;
+            const opt = Array.from(list.options).find(o => o.value === val);
+            if (opt) {
+              pid.value = opt.getAttribute('data-project-id') || '';
+              mid.value = opt.getAttribute('data-milestone-id') || '';
+            }
+          });
+        })();
+      </script>
+    </div>
+
+    <div class="col">
+      <label class="label">Time (HH:MM)</label>
+      <input class="input" type="text" name="hhmm" placeholder="01:30" pattern="^\d{1,2}:[0-5]\d$" required />
+
+    </div>
+
+    <div class="col">
+      <label class="label">Comment (optional)</label>
+      <input class="input" type="text" name="comment" />
+    </div>
+
+    <div class="col" style="align-self:end">
+      <button class="btn">Add</button>
+    </div>
+  </form>
+</div>
+
+<div class="panel">
+  <div class="row" style="align-items:center">
+    <div class="col"><h3>Actions for {{ day_dmy }}</h3></div>
+    <div class="col" style="text-align:right">
+      <form method="get" action="/add-action" class="inline">
+        <label class="label">Change day</label>
+        <input class="input date-dmy" type="text" name="day_dmy" placeholder="DD/MM/YYYY" autocomplete="off" />
+        <button class="btn secondary">Go</button>
+      </form>
+    </div>
+  </div>
+  <table class="table">
+    <thead>
+      <tr><th>Date</th><th>Project</th><th>Milestone</th><th>Time</th><th>Comment</th></tr>
+    </thead>
+    <tbody id="todayActions">
+      {% for a in actions %}
+        <tr>
+          <td>{{ a.date.strftime('%d/%m/%Y') }}</td>
+          <td>{{ a.project_name }}</td>
+          <td>{{ a.milestone_name or '' }}</td>
+	  <td>{{ a.minutes | hhmm }}</td>
+          <td>{{ a.comment or '' }}</td>
+        </tr>
+      {% endfor %}
+      {% if actions|length == 0 %}
+        <tr><td colspan="5" class="muted">No actions yet.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+{% include 'includes/calendar.html' %}
+{% endblock %}
+

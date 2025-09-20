@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: FocusPoint-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-FocusPoint}
+      POSTGRES_USER: ${POSTGRES_USER:-FocusPoint}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-FocusPoint}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-FocusPoint} -d ${POSTGRES_DB:-FocusPoint}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: FocusPoint-web
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg2://FocusPoint:FocusPoint@db:5432/FocusPoint}
+      APP_NAME: ${APP_NAME:-FocusPoint}
+      SECRET_KEY: ${SECRET_KEY:-change-me}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8000"
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/app/static:/app/app/static
+      - ./backend/app/templates:/app/app/templates
+      - ./backend/app/reports:/app/app/reports
+
+volumes:
+  db_data:
+

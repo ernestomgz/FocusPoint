@@ -1,0 +1,80 @@
+/* App layout: left sidebar (hideable) + centered content */
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: var(--bg-elev);
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+  transition: width .22s ease, transform .22s ease, opacity .22s ease;
+}
+.sidebar.collapsed {
+  width: 0 !important;
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.sidebar-inner { padding: 16px; display: flex; flex-direction: column; height: 100%; }
+.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.brand .logo {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: radial-gradient(120% 120% at 0% 0%, var(--primary), #9b7bff);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.08);
+}
+.brand .brand-name { font-weight: 800; letter-spacing:.2px; }
+
+.nav { display: flex; flex-direction: column; gap: 4px; }
+.nav-item { padding: 10px 12px; border-radius: 10px; color: var(--text-muted); }
+.nav-item:hover { background: var(--bg-elev-2); color: var(--text); }
+
+.nav.bottom { margin-top: 12px; }
+.nav-item.as-form { padding: 0; }
+.nav-item.as-form .linkLike {
+  width: 100%; text-align: left; padding: 10px 12px; border: 0; background: transparent; color: var(--text-muted);
+}
+.nav-item.as-form .linkLike:hover { background: var(--bg-elev-2); color: var(--text); border-radius: 10px; }
+
+.content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.topbar .title { font-size: 20px; font-weight: 800; }
+.flexSpacer { flex: 1; }
+
+.panel {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin: 14px 0;
+}
+
+.row { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+.col { grid-column: span 4; }
+.col.w-6 { grid-column: span 6; }
+.inline { display: inline-flex; gap: 8px; align-items: end; }
+
+@media (max-width: 1000px) {
+  .layout { grid-template-columns: 0 1fr; }
+  .sidebar { position: fixed; left: 0; z-index: 10; width: 280px; }
+  .sidebar.collapsed { transform: translateX(-100%); }
+  .content { padding: 16px; }
+  .row { grid-template-columns: 1fr; }
+  .col { grid-column: span 1; }
+}
+
+.table { width: 100%; }
+.table th, .table td { border-bottom: 1px solid var(--border); padding: 8px 6px; text-align: left; }
+
+.topbar .btn.ghost { margin-right: 6px; }
+

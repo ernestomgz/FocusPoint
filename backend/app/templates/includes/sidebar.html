@@ -1,0 +1,29 @@
+<aside id="sidebar" class="sidebar">
+<div class="sidebar-inner">
+<div class="brand">
+<div class="logo"></div>
+<div class="brand-name">{{ APP_NAME }}</div>
+</div>
+
+
+<nav class="nav">
+<a class="nav-item" href="/add-action">Add Action</a>
+<a class="nav-item" href="/categories">Categories</a>
+<a class="nav-item" href="/projects">Projects</a>
+<a class="nav-item" href="/reviews">Week Reviews</a>
+<a class="nav-item" href="/reports">Reports</a>
+</nav>
+
+
+<div class="flexSpacer"></div>
+
+
+<nav class="nav bottom">
+<a class="nav-item" href="/settings">Settings</a>
+<form method="post" action="/logout" class="nav-item as-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+<button class="linkLike" type="submit">Log out</button>
+</form>
+</nav>
+</div>
+</aside>

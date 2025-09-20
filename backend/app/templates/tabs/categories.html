@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="panel">
+<h2>Categories</h2>
+<form method="post" action="/api/categories/upsert" id="catForm">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+<div class="row">
+<div class="col">
+<label class="label">Existing</label>
+<select class="input" name="id" id="cat_id">
+<option value="">(new)</option>
+{% if categories %}
+{% for c in categories %}
+<option value="{{c.id}}">{{c.name}}</option>
+{% endfor %}
+{% endif %}
+</select>
+</div>
+<div class="col">
+<label class="label">Name</label>
+<input class="input" type="text" name="name" id="cat_name" required />
+</div>
+<div class="col">
+<label class="label">Description</label>
+<input class="input" type="text" name="description" id="cat_desc" />
+</div>
+<div class="col" style="align-self:end">
+<button class="btn">Save</button>
+</div>
+</div>
+</form>
+</div>
+
+
+<div class="panel">
+<h3>All categories</h3>
+<table class="table">
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+{% if categories %}
+{% for c in categories %}
+<tr>
+<td>{{ c.name }}</td>
+<td>{{ c.description or '' }}</td>
+</tr>
+{% endfor %}
+{% endif %}
+</tbody>
+</table>
+</div>
+
+
+{% include 'includes/calendar.html' %}
+{% endblock %}

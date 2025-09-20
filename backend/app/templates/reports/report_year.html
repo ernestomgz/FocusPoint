@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ app_name }} – Yearly report</title>
+  <link rel="stylesheet" href="{{ css_paths[0] }}">
+</head>
+<body>
+<div class="header">
+  <h1>{{ app_name }} – Yearly report</h1>
+  <div>
+    <span class="chip">Period: {{ start.strftime('%d/%m/%Y') }} → {{ end.strftime('%d/%m/%Y') }}</span>
+    <span class="chip">Generated: {{ generated.strftime('%d/%m/%Y') }}</span>
+    <span class="chip">Busiest: {{ busiest_label }} ({{ busiest_value }})</span>
+  </div>
+</div>
+
+<table class="kpi-table">
+  <tr>
+    <td><div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-value">{{ year_total_hhmm }}</div></div></td>
+    <td><div class="kpi-card"><div class="kpi-label">Active days</div><div class="kpi-value">{{ active_days }}</div></div></td>
+    <td><div class="kpi-card"><div class="kpi-label">Avg/active day</div><div class="kpi-value">{{ avg_active_hhmm }}</div></div></td>
+  </tr>
+  <tr>
+    <td><div class="kpi-card"><div class="kpi-label">Top-1 share</div><div class="kpi-value">{{ top1_share }}</div></div></td>
+    <td><div class="kpi-card"><div class="kpi-label">Top-3 share</div><div class="kpi-value">{{ top3_share }}</div></div></td>
+    <td><div class="kpi-card"><div class="kpi-label">Longest streak</div><div class="kpi-value">{{ longest_streak }}d</div></div></td>
+  </tr>
+</table>
+
+<div class="card">
+  <h2>{{ series_title }}</h2>
+  <div class="bars-wrap">
+    <svg width="100%" height="160" viewBox="0 0 980 160" preserveAspectRatio="none">
+      {% set maxv = series_max if series_max>0 else 1 %}
+      {% for i in range(series_values|length) %}
+        {% set v = series_values[i] %}
+        {% set count = (series_values|length) %}
+        {% set step = (600 // (count if count>0 else 1)) %}
+        {% set x = 20 + i*step %}
+        {% set h = (12 + (v * 120 / maxv)) | round(0, 'floor') %}
+        {% set y = 130 - h %}
+        <rect x="{{ x }}" y="{{ y }}" width="{{ step-30 if step>40 else 10 }}" height="{{ h }}" fill="#7c4dff" rx="6" ry="6"/>
+        <text x="{{ x + (step-30 if step>40 else 10)/2 }}" y="150" font-size="12" fill="#555" text-anchor="middle">{{ series_labels[i] }}</text>
+      {% endfor %}
+    </svg>
+  </div>
+  <p class="small">Monthly totals keep the annual view readable.</p>
+</div>
+
+<div class="grid" style="grid-template-columns:1fr 1fr">
+  <div class="card">
+    <h2>By category</h2>
+    <table>
+      <thead><tr><th>Category</th><th>Time</th></tr></thead>
+      <tbody>
+      {% for c in categories_data %}
+        <tr><td>{{ c.category }}</td><td>{{ c.minutes|hhmm }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>Top projects</h2>
+    <table>
+      <thead><tr><th>Project</th><th>Hours</th><th>Share</th><th>Overdue MS</th><th>At risk</th></tr></thead>
+      <tbody>
+        {% set total = projects | map(attribute='total_minutes') | sum %}
+        {% for p in projects[:12] %}
+          {% set share = (p.total_minutes * 100.0 / (total if total>0 else 1)) %}
+          <tr>
+            <td>{{ p.name }}</td>
+            <td>{{ p.total_minutes|hhmm }}</td>
+            <td>{{ '%.1f'|format(share) }}%</td>
+            <td>{{ p.overdue }}</td>
+            <td>{{ p.risk }}</td>
+          </tr>
+        {% endfor %}
+        {% if projects|length == 0 %}<tr><td colspan="5" class="small">No project time this year.</td></tr>{% endif %}
+      </tbody>
+    </table>
+    <p class="small">Showing top projects. Export CSV for full detail if needed.</p>
+  </div>
+</div>
+
+<div class="grid" style="grid-template-columns:1fr 1fr">
+  <div class="card">
+    <h2>Overdue (as of {{ end.strftime('%d/%m/%Y') }})</h2>
+    <table>
+      <thead><tr><th>Project</th><th>Milestone</th><th>Ended</th><th>Late</th></tr></thead>
+      <tbody>
+        {% for m in overdue %}
+          <tr><td>{{ m.project }}</td><td>{{ m.milestone }}</td><td>{{ m.end.strftime('%d/%m/%Y') }}</td><td>{{ m.days_late }}d</td></tr>
+        {% endfor %}
+        {% if overdue|length == 0 %}<tr><td colspan="4" class="small">None</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>Upcoming (next 30 days)</h2>
+    <table>
+      <thead><tr><th>Project</th><th>Milestone</th><th>Due</th><th>Progress</th></tr></thead>
+      <tbody>
+        {% for m in upcoming %}
+          <tr><td>{{ m.project }}</td><td>{{ m.milestone }}</td><td>{{ m.end.strftime('%d/%m/%Y') }}</td><td>{{ m.percent }}%</td></tr>
+        {% endfor %}
+        {% if upcoming|length == 0 %}<tr><td colspan="4" class="small">None</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Strategic notes</h2>
+  <ul>
+    {% for s in suggestions %}<li>{{ s }}</li>{% endfor %}
+    {% if suggestions|length == 0 %}<li class="small">No suggestions.</li>{% endif %}
+  </ul>
+</div>
+
+<p class="small" style="margin-top:6px">Generated by {{ app_name }} on {{ generated.strftime('%d/%m/%Y') }}.</p>
+</body>
+</html>
+

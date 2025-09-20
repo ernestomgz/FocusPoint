@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{{ title or APP_NAME }}</title>
+{% include 'includes/head_links.html' %}
+</head>
+<body class="theme">
+<div id="app" class="layout">
+{% include 'includes/sidebar.html' %}
+
+
+<main id="content" class="content">
+<header class="topbar">
+<button id="sidebarToggle" class="btn ghost" aria-label="Toggle sidebar">☰</button>
+<h1 class="title">{{ title or APP_NAME }}</h1>
+<div class="flexSpacer"></div>
+</header>
+
+
+{% include 'includes/flash.html' %}
+{% block content %}{% endblock %}
+</main>
+</div>
+
+
+<script src="/static/js/app.js"></script>
+<script src="/static/js/sidebar.js"></script>
+<script src="/static/js/calendar.js"></script>
+<script src="/static/js/forms.js"></script>
+</body>
+</html>

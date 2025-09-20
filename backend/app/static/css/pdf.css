@@ -1,0 +1,196 @@
+/* =========================================================
+   FocusPoint PDF stylesheet (WeasyPrint)
+   - Shared across Weekly / Monthly / Yearly reports
+   - Obsidian-ish, clean, print-friendly
+   ========================================================= */
+
+@page {
+  size: A4;
+  margin: 20mm 16mm 18mm 16mm;
+  @bottom-center {
+    content: "Page " counter(page) " of " counter(pages);
+    font-size: 10px;
+    color: #7c4dff;
+  }
+}
+
+/* -------- Design tokens -------- */
+:root{
+  --bg:#ffffff;
+  --text:#111;
+  --muted:#666;
+  --border:#e9e7f5;
+  --accent:#7c4dff;
+  --accent2:#9c6bff;
+  --ok:#2ec27e;
+  --warn:#ffcc66;
+  --danger:#ff6b6b;
+}
+
+/* -------- Base -------- */
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "DejaVu Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.35;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+h1, h2, h3 { margin: 0 0 8px 0; }
+h1 { font-size: 22px; font-weight: 800; }
+h2 { font-size: 15px; font-weight: 700; }
+h3 { font-size: 13px; font-weight: 700; }
+strong { font-weight: 800; }
+.small { font-size: 11px; color: var(--muted); }
+.muted { color: var(--muted); }
+
+/* -------- Header blocks -------- */
+.header {
+  border-radius: 12px;
+  padding: 16px;
+  color: #fff;
+  margin: 0 0 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+}
+
+.pdf-header {
+  /* Legacy header support */
+  border-bottom: 2px solid #e7e7ef;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.chip {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.35);
+  background: rgba(255,255,255,.15);
+  margin-right: 6px;
+}
+
+/* -------- Layout / cards -------- */
+.grid { display: grid; gap: 10px; }
+
+/* KPI grid: 2 rows × 3 columns (6 cards total) */
+/* Compact KPI table: robust in WeasyPrint */
+.kpi-table {
+  width: 100%;
+  border-collapse: separate;   /* allow spacing */
+  border-spacing: 8px;         /* gap between cells */
+  margin: 6px 0 10px;
+}
+.kpi-table td {
+  padding: 0;                  /* the card handles padding */
+  vertical-align: middle;
+}
+
+.kpi-card {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  text-align: center;
+  page-break-inside: avoid;
+}
+.kpi-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  margin-bottom: 2px;
+}
+.kpi-value {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  background: #fff;
+  page-break-inside: avoid;
+}
+
+/* Two-column helper (legacy support) */
+.twocol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+/* -------- Tables -------- */
+table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+th, td {
+  font-size: 12px;
+  border: 1px solid var(--border);
+  padding: 6px;
+  text-align: left;
+  vertical-align: top;
+}
+th { background: #fafafe; font-weight: 700; }
+
+/* -------- Bars (SVG container) -------- */
+.bars-wrap {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px;
+  background: #fff;
+  page-break-inside: avoid;
+}
+
+/* -------- Legacy horizontal bar components (if used anywhere) -------- */
+.bars { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.bar {
+  display: grid;
+  grid-template-columns: 120px 1fr 70px;
+  gap: 10px;
+  align-items: center;
+}
+.bar-label { text-align: right; color: #333; }
+.bar-track {
+  background: #f1effa;
+  border: 1px solid #e6e3ff;
+  border-radius: 999px;
+  height: 12px;
+  overflow: hidden;
+}
+.bar-fill {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  height: 100%;
+  width: 0%;
+}
+.bar-value { text-align: left; color: #333; }
+
+/* -------- Pills / badges (optional) -------- */
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  border: 1px solid var(--border);
+  margin-right: 6px;
+  background: #fff;
+}
+
+/* -------- Utility colors for statuses -------- */
+.badge-ok    { color: #0d5e3e; background: #e8f7ef; border: 1px solid #c9f0de; }
+.badge-warn  { color: #7a5200; background: #fff7e0; border: 1px solid #ffe7a8; }
+.badge-danger{ color: #7a0d0d; background: #ffe8e8; border: 1px solid #ffc9c9; }
+
+/* -------- Spacing helpers -------- */
+.mt-0{ margin-top: 0; }
+.mt-4{ margin-top: 4px; }
+.mt-6{ margin-top: 6px; }
+.mt-8{ margin-top: 8px; }
+.mt-12{ margin-top: 12px; }
+
+/* -------- Prevent awkward page breaks -------- */
+.avoid-break, .kpi, .card, .bars, table { page-break-inside: avoid; }
+
